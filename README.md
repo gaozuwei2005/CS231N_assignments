@@ -1,0 +1,1 @@
+This repository contains assignment material for the *Deep Learning for Computer Vision* class.
