@@ -23,6 +23,7 @@ def main(files, pdf_name):
     for f in files:
         os_args.append(f)
         subprocess.run(os_args)
+        os_args.pop()
         print("Created PDF {}.".format(f))
     if MERGE:
         pdfs = [f.split(".")[0] + ".pdf" for f in files]

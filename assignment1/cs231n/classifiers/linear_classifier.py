@@ -1,10 +1,11 @@
 from __future__ import print_function
 
+import os
 from builtins import range
 from builtins import object
 import numpy as np
-from ..classifiers.linear_svm import *
 from ..classifiers.softmax import *
+from past.builtins import xrange
 
 
 class LinearClassifier(object):
@@ -51,6 +52,7 @@ class LinearClassifier(object):
         for it in range(num_iters):
             X_batch = None
             y_batch = None
+
             #########################################################################
             # TODO:                                                                 #
             # Sample batch_size elements from the training data and their           #
@@ -62,14 +64,9 @@ class LinearClassifier(object):
             # Hint: Use np.random.choice to generate indices. Sampling with         #
             # replacement is faster than sampling without replacement.              #
             #########################################################################
-            # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            indices=np.random.choice(num_train,size=batch_size,replace=False)
-            X_batch=X[indices,:]
-            y_batch=y[indices]
-            # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            # evaluate loss and gradientS
+            # evaluate loss and gradient
             loss, grad = self.loss(X_batch, y_batch, reg)
             loss_history.append(loss)
 
@@ -78,11 +75,7 @@ class LinearClassifier(object):
             # TODO:                                                                 #
             # Update the weights using the gradient and the learning rate.          #
             #########################################################################
-            # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            self.W-=grad*learning_rate
-
-            # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
             if verbose and it % 100 == 0:
                 print("iteration %d / %d: loss %f" % (it, num_iters, loss))
@@ -108,11 +101,7 @@ class LinearClassifier(object):
         # TODO:                                                                   #
         # Implement this method. Store the predicted labels in y_pred.            #
         ###########################################################################
-        # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        scores=np.dot(X,self.W)
-        y_pred=np.argmax(scores,axis=1)
-        # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return y_pred
 
     def loss(self, X_batch, y_batch, reg):
@@ -130,7 +119,26 @@ class LinearClassifier(object):
         - loss as a single float
         - gradient with respect to self.W; an array of the same shape as W
         """
-        raise NotImplementedError("Subclasses must implement loss()")
+        pass
+
+    def save(self, fname):
+      """Save model parameters."""
+      fpath = os.path.join(os.path.dirname(__file__), "../saved/", fname)
+      params = {"W": self.W}
+      np.save(fpath, params)
+      print(fname, "saved.")
+    
+    def load(self, fname):
+      """Load model parameters."""
+      fpath = os.path.join(os.path.dirname(__file__), "../saved/", fname)
+      if not os.path.exists(fpath):
+        print(fname, "not available.")
+        return False
+      else:
+        params = np.load(fpath, allow_pickle=True).item()
+        self.W = params["W"]
+        print(fname, "loaded.")
+        return True
 
 
 class LinearSVM(LinearClassifier):

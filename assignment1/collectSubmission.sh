@@ -5,7 +5,6 @@ set -euo pipefail
 CODE=(
 	"cs231n/classifiers/k_nearest_neighbor.py"
 	"cs231n/classifiers/linear_classifier.py"
-	"cs231n/classifiers/linear_svm.py"
 	"cs231n/classifiers/softmax.py"
 	"cs231n/classifiers/fc_net.py"
 	"cs231n/optim.py"
@@ -19,10 +18,10 @@ CODE=(
 # in order of questions
 NOTEBOOKS=(
 	"knn.ipynb"
-	"svm.ipynb"
 	"softmax.ipynb"
 	"two_layer_net.ipynb"
 	"features.ipynb"
+	"FullyConnectedNets.ipynb"
 )
 
 FILES=( "${CODE[@]}" "${NOTEBOOKS[@]}" )
@@ -47,7 +46,7 @@ done
 
 echo -e "### Zipping file ###"
 rm -f ${ZIP_FILENAME}
-zip -q "${ZIP_FILENAME}" -r ${NOTEBOOKS[@]} $(find . -name "*.py") -x "makepdf.py"
+zip -q "${ZIP_FILENAME}" -r ${NOTEBOOKS[@]} $(find . -name "*.py") "cs231n/saved" -x "makepdf.py"
 
 echo -e "### Creating PDFs ###"
 python makepdf.py --notebooks "${NOTEBOOKS[@]}" --pdf_filename "${PDF_FILENAME}"

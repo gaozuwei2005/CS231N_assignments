@@ -1,6 +1,7 @@
 from __future__ import print_function
 from builtins import zip
 from builtins import range
+from past.builtins import xrange
 
 import matplotlib
 import numpy as np
@@ -147,3 +148,71 @@ def color_histogram_hsv(im, nbin=10, xmin=0, xmax=255, normalized=True):
 
     # return histogram
     return imhist
+
+
+# ~~START DELETE~~
+# These are some other features that we implemented to play around, but aren't
+# distributing to students.
+def color_histogram(im, nbin=10, xmin=0, xmax=255, normalized=True):
+    """Compute color histogram feature for an image
+
+      Parameters:
+        im : a numpy array of grayscale or rgb image
+        nbin : number of histogram bins (default: 10)
+        xmin : minimum pixel value (default: 0)
+        xmax : maximum pixel value (deafult: 255)
+        normalized : bool flag to normalize the histogram
+
+      Returns:
+        feat : color histogram feature
+
+    """
+    ndim = im.ndim
+    bins = np.linspace(xmin, xmax, nbin + 1)
+    # grayscale image
+    if ndim == 2:
+        imhist, bin_edges = np.histogram(im, bins=bins, density=normalized)
+        return imhist
+    # rgb image
+    elif ndim == 3:
+        color_hist = np.array([])
+        # loop through three color channels
+        for k in range(3):
+            # compute normalized histogram
+            imhist, bin_edges = np.histogram(im[:, :, k], bins=bins, density=normalized)
+            imhist = imhist * np.diff(bin_edges)
+            # concatenate histogram
+            color_hist = np.concatenate((color_hist, imhist))
+        # return histogram
+        return color_hist
+    # unknown image type
+    return np.array([])
+
+
+def color_histogram_spatial(img, levels=3, nbin=4):
+    """
+    Color histogram over a pyramid.
+    """
+    feats = []
+
+    for level in range(1, levels + 1):
+        chunks = np.array_split(img, level, axis=0)
+        chunks = [np.array_split(chunk, level, axis=1) for chunk in chunks]
+        for x in chunks:
+            for chunk in x:
+                feats.append(color_histogram_cross(chunk, nbin=nbin))
+
+    return np.hstack(feats)
+
+
+def color_histogram_cross(img, nbin=5, normalized=True):
+    """
+    RGB color histogram where our bins are 3 dimensional.
+    """
+    height, width, channels = img.shape
+    new_size = (height * width, channels)
+    colors = np.reshape(img, new_size)
+    return np.histogramdd(colors, bins=nbin, normed=normalized)[0].flatten()
+
+
+# ~~END DELETE~~
